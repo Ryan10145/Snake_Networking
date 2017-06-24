@@ -12,9 +12,9 @@ import java.net.InetAddress;
 
 public class PlayState extends State
 {
-	private int[] foodCoordinates;
+	private static int[] foodCoordinates;
 	private static int tileLength;
-	private boolean paused;
+	private static boolean paused;
 
 	public PlayState()
 	{
@@ -106,7 +106,10 @@ public class PlayState extends State
 				else player.keyPressed(key, 2);
 			}
 		}
-		if(key == KeyEvent.VK_ESCAPE) paused = !paused;
+		if(key == KeyEvent.VK_ESCAPE)
+		{
+			ConnectState.getClientThread().setPaused(!paused);
+		}
 	}
 
 	public void keyReleased(int key)
@@ -141,5 +144,16 @@ public class PlayState extends State
 		}
 
 		return player;
+	}
+
+	public static void setPaused(boolean paused)
+	{
+		PlayState.paused = paused;
+	}
+
+	public static void setFoodCoordinates(int column, int row)
+	{
+		foodCoordinates[0] = column;
+		foodCoordinates[1] = row;
 	}
 }

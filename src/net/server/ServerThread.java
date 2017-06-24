@@ -2,10 +2,7 @@ package net.server;
 
 import components.PlayerMP;
 import net.client.ClientThread;
-import net.packet.Packet;
-import net.packet.Packet00Login;
-import net.packet.Packet01Disconnect;
-import net.packet.Packet02NewPlayer;
+import net.packet.*;
 import state.states.ConnectState;
 import state.states.PlayState;
 
@@ -60,14 +57,28 @@ public class ServerThread extends Thread
 		Packet.PacketType type = Packet.lookUpPacket(message.substring(0, 2));
 		switch(type)
 		{
-		case INVALID:
-			break;
-		case LOGIN:
-			handleLogin(new Packet00Login(data), address, port);
-			break;
-		case DISCONNECT:
-			handleDisconnect(new Packet01Disconnect(data), address, port);
-			break;
+			case INVALID:
+				break;
+			case LOGIN:
+				handleLogin(new Packet00Login(data), address, port);
+				break;
+			case DISCONNECT:
+				handleDisconnect(new Packet01Disconnect(data), address, port);
+				break;
+			case NEW_PLAYER:
+				break;
+			case MOVE:
+				break;
+			case GENERATE_FOOD:
+				break;
+			case PAUSE:
+				System.out.println("Received the pause packet");
+				Packet05Pause packetPause = new Packet05Pause(data);
+				packetPause.writeData(this);
+				break;
+			case ERROR_PLAYERS:
+
+				break;
 		}
 	}
 
@@ -76,7 +87,15 @@ public class ServerThread extends Thread
 		System.out.println(packet.getUsername() + " has connected.");
 		PlayerMP player = PlayState.createNewPlayer(ConnectState.getClientThread().getPlayers().size(),
 				address, port, packet.getUsername(), false);
-		addPlayer(player, packet);
+		if(player != null) addPlayer(player, packet);
+
+		else
+		{
+			Packet06ErrorPlayers errorPacket = new Packet06ErrorPlayers();
+			sendData(errorPacket.getData(), address, port);
+
+			System.out.println(packet.getUsername() + " cannot join due to too many players.");
+		}
 	}
 
 	private void addPlayer(PlayerMP connectingPlayer, Packet00Login loginPacket)

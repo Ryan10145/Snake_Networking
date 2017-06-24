@@ -1,11 +1,10 @@
 package net.client;
 
 import components.PlayerMP;
-import net.packet.Packet;
-import net.packet.Packet01Disconnect;
-import net.packet.Packet02NewPlayer;
+import net.packet.*;
 import state.states.PlayState;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -61,18 +60,33 @@ public class ClientThread extends Thread
 		Packet.PacketType type = Packet.lookUpPacket(message.substring(0, 2));
 		switch(type)
 		{
-		case INVALID:
+			case INVALID:
 
-			break;
-		case LOGIN:
+				break;
+			case LOGIN:
 
-			break;
-		case DISCONNECT:
-			handleDisconnect(new Packet01Disconnect(data));
-			break;
-		case NEW_PLAYER:
-			handleNewPlayer(new Packet02NewPlayer(data), address, port);
-			break;
+				break;
+			case DISCONNECT:
+				handleDisconnect(new Packet01Disconnect(data));
+				break;
+			case NEW_PLAYER:
+				handleNewPlayer(new Packet02NewPlayer(data), address, port);
+				break;
+			case MOVE:
+
+				break;
+			case GENERATE_FOOD:
+
+				break;
+			case PAUSE:
+				Packet05Pause packet = new Packet05Pause(data);
+				PlayState.setPaused(packet.isPaused());
+				break;
+			case ERROR_PLAYERS:
+				JOptionPane.showMessageDialog(null, "Unable to connect, too many players",
+						"Error", JOptionPane.ERROR_MESSAGE);
+				System.exit(0);
+				break;
 		}
 	}
 
@@ -116,11 +130,6 @@ public class ClientThread extends Thread
 		PlayerMP player = PlayState.createNewPlayer(playerIndex, address, port, packet.getUsername(),
 				packet.isCurrentPlayer());
 		if(player != null) players.add(player);
-		else
-		{
-			//TODO Send Error Packet
-			System.out.println(packet.getUsername() + " cannot join due to too many players.");
-		}
 
 		if(packet.isCurrentPlayer()) currentPlayer = player;
 	}
@@ -146,5 +155,11 @@ public class ClientThread extends Thread
 	public PlayerMP getCurrentPlayer()
 	{
 		return currentPlayer;
+	}
+
+	public void setPaused(boolean isPaused)
+	{
+		Packet05Pause pausePacket = new Packet05Pause(isPaused);
+		pausePacket.writeData(this);
 	}
 }

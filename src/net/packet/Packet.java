@@ -5,17 +5,9 @@ import net.server.ServerThread;
 
 public abstract class Packet
 {
-	/* Future Types of Packets:
-	 * LOGIN
-	 * DISCONNECT
-	 * NEW_PLAYER
-	 * MOVE
-	 * GENERATE_FOOD
-	 *
-	 */
 	public enum PacketType
 	{
-		INVALID(-1), LOGIN(00), DISCONNECT(01), NEW_PLAYER(02);
+		INVALID(-1), LOGIN(00), DISCONNECT(01), NEW_PLAYER(02), MOVE(03), GENERATE_FOOD(04), PAUSE(05), ERROR_PLAYERS(06);
 
 		private int packetId;
 
@@ -40,15 +32,16 @@ public abstract class Packet
 	public abstract void writeData(ClientThread clientThread);
 	public abstract void writeData(ServerThread serverThread);
 
-	public String readData(byte[] data)
+	String readData(byte[] data)
 	{
 		String message = new String(data).trim();
-		return message.substring(2);
+		if(message.length() > 2) return message.substring(2);
+		else return "";
 	}
 
 	public abstract byte[] getData();
 
-	public static PacketType lookUpPacket(int packetId)
+	private static PacketType lookUpPacket(int packetId)
 	{
 		for(PacketType packetType : PacketType.values())
 		{
