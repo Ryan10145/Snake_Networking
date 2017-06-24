@@ -4,7 +4,9 @@ import components.PlayerMP;
 import net.client.ClientThread;
 import net.packet.Packet;
 import net.packet.Packet00Login;
+import net.packet.Packet01Disconnect;
 import net.packet.Packet02NewPlayer;
+import state.states.ConnectState;
 import state.states.PlayState;
 
 import java.io.IOException;
@@ -64,6 +66,7 @@ public class ServerThread extends Thread
 			handleLogin(new Packet00Login(data), address, port);
 			break;
 		case DISCONNECT:
+			handleDisconnect(new Packet01Disconnect(data), address, port);
 			break;
 		}
 	}
@@ -71,7 +74,7 @@ public class ServerThread extends Thread
 	private void handleLogin(Packet00Login packet, InetAddress address, int port)
 	{
 		System.out.println(packet.getUsername() + " has connected.");
-		PlayerMP player = PlayState.createNewPlayer(ClientThread.getPlayers().size(),
+		PlayerMP player = PlayState.createNewPlayer(ConnectState.getClientThread().getPlayers().size(),
 				address, port, packet.getUsername(), false);
 		addPlayer(player, packet);
 	}
@@ -110,19 +113,42 @@ public class ServerThread extends Thread
 
 			boolean isClientPlayer = false;
 			if(i == players.size() - 1) isClientPlayer = true;
-			Packet02NewPlayer packet = new Packet02NewPlayer(loginPacket.getUsername(), isClientPlayer);
 
 			if(i != players.size() - 1)
 			{
 				//Tell the old client that the new player exists
 				//On the last iteration, this should not happen, as it is
+				Packet02NewPlayer packet = new Packet02NewPlayer(loginPacket.getUsername(), isClientPlayer);
 				sendData(packet.getData(), playerMP.getIpAddress(), playerMP.getPort());
 			}
 
 			//Tell the new client that the iterated player exists
 			//The last one sent should tell the client that it is itself
+			Packet02NewPlayer packet = new Packet02NewPlayer(playerMP.getUsername(), isClientPlayer);
 			sendData(packet.getData(), connectingPlayer.getIpAddress(), connectingPlayer.getPort());
 		}
+	}
+
+	private void handleDisconnect(Packet01Disconnect packet, InetAddress address, int port)
+	{
+		System.out.println(packet.getUsername() + " has left.");
+		removePlayer(packet);
+	}
+
+	private void removePlayer(Packet01Disconnect disconnectPacket)
+	{
+		players.remove(getPlayerMP(disconnectPacket.getUsername()));
+		disconnectPacket.writeData(this);
+	}
+
+	private PlayerMP getPlayerMP(String username)
+	{
+		for(PlayerMP player : players)
+		{
+			if(player.getUsername().equals(username)) return player;
+		}
+
+		return null;
 	}
 
 	private void sendData(byte[] data, InetAddress ipAddress, int port)

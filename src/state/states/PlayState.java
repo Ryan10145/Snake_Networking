@@ -33,13 +33,13 @@ public class PlayState extends State
 
 	public void update()
 	{
-		if(ClientThread.getPlayers().size() > 1 && !paused)
+		if(ConnectState.getClientThread().getPlayers().size() > 1 && !paused)
 		{
-			for(Player player : ClientThread.getPlayers())
+			for(Player player : ConnectState.getClientThread().getPlayers())
 			{
 				if(!player.isGameOver())
 				{
-					player.update(ClientThread.getPlayers());
+					player.update(ConnectState.getClientThread().getPlayers());
 					if(player.hasCoordinates(foodCoordinates))
 					{
 						player.addToLength(1);
@@ -55,7 +55,7 @@ public class PlayState extends State
 		foodCoordinates[0] = (int) (Math.random() * (GamePanel.WIDTH / tileLength));
 		foodCoordinates[1] = (int) (Math.random() * (GamePanel.HEIGHT / tileLength));
 
-		for(Player player : ClientThread.getPlayers())
+		for(Player player : ConnectState.getClientThread().getPlayers())
 		{
 			if(player.hasCoordinates(foodCoordinates))
 			{
@@ -69,9 +69,10 @@ public class PlayState extends State
 		g2d.setColor(Color.BLUE);
 		g2d.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
 
-		for(int i = 0; i < ClientThread.getPlayers().size(); i++)
+		for(int i = 0; i < ConnectState.getClientThread().getPlayers().size(); i++)
+			//TODO Set different colors for the players, and set their score to be the same color
 		{
-			Player player = ClientThread.getPlayers().get(i);
+			Player player = ConnectState.getClientThread().getPlayers().get(i);
 
 			g2d.setColor(Color.WHITE);
 			g2d.setFont(new Font("default", Font.BOLD, 40));
@@ -96,7 +97,7 @@ public class PlayState extends State
 	{
 		if(!paused)
 		{
-			for(PlayerMP player : ClientThread.getPlayers())
+			for(PlayerMP player : ConnectState.getClientThread().getPlayers())
 			{
 				if(player.isLocal())
 				{

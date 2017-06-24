@@ -12,6 +12,8 @@ import java.awt.*;
 public class ConnectState extends State
 {
 	private StateManager stateManager;
+	private static ClientThread clientThread;
+	private static ServerThread serverThread;
 
 	public ConnectState(StateManager stateManager)
 	{
@@ -25,11 +27,11 @@ public class ConnectState extends State
 
 		if(JOptionPane.showConfirmDialog(null, "Do you want to run the server?") == JOptionPane.YES_OPTION)
 		{
-			ServerThread serverThread = new ServerThread();
+			serverThread = new ServerThread();
 			serverThread.start();
 		}
 
-		ClientThread clientThread = new ClientThread("localhost");
+		clientThread = new ClientThread("localhost");
 		clientThread.start();
 		packet00Login.writeData(clientThread);
 		stateManager.setState(StateManager.PLAY_STATE);
@@ -52,5 +54,15 @@ public class ConnectState extends State
 	public void keyReleased(int key)
 	{
 
+	}
+
+	public static ClientThread getClientThread()
+	{
+		return clientThread;
+	}
+
+	public static ServerThread getServerThread()
+	{
+		return serverThread;
 	}
 }

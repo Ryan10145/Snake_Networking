@@ -1,9 +1,8 @@
 package net.client;
 
-import components.Player;
 import components.PlayerMP;
 import net.packet.Packet;
-import net.packet.Packet00Login;
+import net.packet.Packet01Disconnect;
 import net.packet.Packet02NewPlayer;
 import state.states.PlayState;
 
@@ -12,13 +11,15 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class ClientThread extends Thread
 {
 	private InetAddress ipAddress;
 	private DatagramSocket socket;
 
-	private static ArrayList<PlayerMP> players = new ArrayList<>();
+	private ArrayList<PlayerMP> players = new ArrayList<>();
+	private PlayerMP currentPlayer;
 
 	public ClientThread(String ipAddress)
 	{
@@ -67,7 +68,7 @@ public class ClientThread extends Thread
 
 			break;
 		case DISCONNECT:
-
+			handleDisconnect(new Packet01Disconnect(data));
 			break;
 		case NEW_PLAYER:
 			handleNewPlayer(new Packet02NewPlayer(data), address, port);
@@ -75,18 +76,53 @@ public class ClientThread extends Thread
 		}
 	}
 
+	private void handleDisconnect(Packet01Disconnect disconnectPacket)
+	{
+		System.out.println(disconnectPacket.getUsername() + " has left.");
+		removePlayer(disconnectPacket.getUsername());
+	}
+
+	private void removePlayer(String username)
+	{
+		Iterator iterator = players.iterator();
+		while(iterator.hasNext())
+		{
+			PlayerMP player = (PlayerMP) iterator.next();
+			if(player.getUsername().equals(username))
+			{
+				iterator.remove();
+				break;
+			}
+		}
+	}
+
 	private void handleNewPlayer(Packet02NewPlayer packet, InetAddress address, int port)
 	{
 		System.out.println(packet.getUsername() + " has joined.");
-		PlayerMP player = PlayState.createNewPlayer(players.size(), address, port, packet.getUsername(),
+		int playerIndex = -1;
+		for(int i = 0; i < 4; i++)
+		{
+			if(players.size() <= i)
+			{
+				playerIndex = i;
+				break;
+			}
+			else if(players.get(i) == null)
+			{
+				playerIndex = i;
+				break;
+			}
+		}
+		PlayerMP player = PlayState.createNewPlayer(playerIndex, address, port, packet.getUsername(),
 				packet.isCurrentPlayer());
-		System.out.println(packet.isCurrentPlayer());
 		if(player != null) players.add(player);
 		else
 		{
 			//TODO Send Error Packet
 			System.out.println(packet.getUsername() + " cannot join due to too many players.");
 		}
+
+		if(packet.isCurrentPlayer()) currentPlayer = player;
 	}
 
 	public void sendData(byte[] data)
@@ -102,8 +138,13 @@ public class ClientThread extends Thread
 		}
 	}
 
-	public static ArrayList<PlayerMP> getPlayers()
+	public ArrayList<PlayerMP> getPlayers()
 	{
 		return players;
+	}
+
+	public PlayerMP getCurrentPlayer()
+	{
+		return currentPlayer;
 	}
 }
