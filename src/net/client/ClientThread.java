@@ -1,5 +1,6 @@
 package net.client;
 
+import components.Player;
 import components.PlayerMP;
 import net.packet.*;
 import state.states.PlayState;
@@ -73,7 +74,9 @@ public class ClientThread extends Thread
 				handleNewPlayer(new Packet02NewPlayer(data), address, port);
 				break;
 			case MOVE:
-
+				Packet03Move movePacket = new Packet03Move(data);
+				Player player = getPlayerMP(movePacket.getUsername());
+				if(player != null) player.setDirection(movePacket.getDirection());
 				break;
 			case GENERATE_FOOD:
 				Packet04GenerateFood foodPacket = new Packet04GenerateFood(data);
@@ -123,6 +126,7 @@ public class ClientThread extends Thread
 			if(players.size() <= i)
 			{
 				playerIndex = i;
+				System.out.println("asd");
 				break;
 			}
 			else if(players.get(i) == null)
@@ -161,6 +165,16 @@ public class ClientThread extends Thread
 		return currentPlayer;
 	}
 
+	private PlayerMP getPlayerMP(String username)
+	{
+		for(PlayerMP player : players)
+		{
+			if(player.getUsername().equals(username)) return player;
+		}
+
+		return null;
+	}
+
 	public void setPaused(boolean isPaused)
 	{
 		Packet05Pause pausePacket = new Packet05Pause(isPaused);
@@ -177,5 +191,11 @@ public class ClientThread extends Thread
 	{
 		Packet07Restart restartPacket = new Packet07Restart();
 		restartPacket.writeData(this);
+	}
+
+	public void setDirection(int direction)
+	{
+		Packet03Move movePacket = new Packet03Move(currentPlayer.getUsername(), direction);
+		movePacket.writeData(this);
 	}
 }

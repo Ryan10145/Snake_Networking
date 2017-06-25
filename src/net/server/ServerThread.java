@@ -68,6 +68,8 @@ public class ServerThread extends Thread
 			case NEW_PLAYER:
 				break;
 			case MOVE:
+				Packet03Move movePacket = new Packet03Move(data);
+				movePacket.writeData(this);
 				break;
 			case GENERATE_FOOD:
 				Packet04GenerateFood foodPacket = new Packet04GenerateFood(data);

@@ -23,7 +23,14 @@ public class ConnectState extends State
 
 	public void init() //TODO Refuse all spaces/blank usernames
 	{
-		Packet00Login packet00Login = new Packet00Login(JOptionPane.showInputDialog("Enter a Username"));
+		String username;
+		do
+		{
+			username = JOptionPane.showInputDialog("Enter a Username").trim();
+			System.out.println(username);
+		} while(username.equals(""));
+
+		Packet00Login packet00Login = new Packet00Login(username);
 
 		if(JOptionPane.showConfirmDialog(null, "Do you want to run the server?") == JOptionPane.YES_OPTION)
 		{

@@ -57,7 +57,7 @@ public class PlayState extends State
 
 		for(Player player : ConnectState.getClientThread().getPlayers())
 		{
-			if(player.hasCoordinates(foodCoordinates))
+			if(player.hasCoordinates(new int[] {column, row}))
 			{
 				generateFood();
 				return;
@@ -104,9 +104,9 @@ public class PlayState extends State
 			{
 				if(player.isLocal())
 				{
-					player.keyPressed(key, 0);
+					player.keyPressed(key);
 				}
-				else player.keyPressed(key, 2);
+				else player.keyPressed(key);
 			}
 		}
 		if(key == KeyEvent.VK_ESCAPE)

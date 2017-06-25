@@ -1,6 +1,7 @@
 package components;
 
 import main.GamePanel;
+import state.states.ConnectState;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -113,43 +114,22 @@ public class Player
 				tileLength, tileLength);
 	}
 
-	public void keyPressed(int key, int control) //0 for arrows, 1 for wasd, 2 for other client
+	public void keyPressed(int key) //0 for arrows, 1 for wasd, 2 for other client
 	{
-		if(control == 0)
+		switch(key)
 		{
-			switch(key)
-			{
-			case KeyEvent.VK_UP:
-				direction = 0;
-				break;
-			case KeyEvent.VK_RIGHT:
-				direction = 1;
-				break;
-			case KeyEvent.VK_DOWN:
-				direction = 2;
-				break;
-			case KeyEvent.VK_LEFT:
-				direction = 3;
-				break;
-			}
-		}
-		else if(control == 1)
-		{
-			switch(key)
-			{
-			case KeyEvent.VK_W:
-				direction = 0;
-				break;
-			case KeyEvent.VK_D:
-				direction = 1;
-				break;
-			case KeyEvent.VK_S:
-				direction = 2;
-				break;
-			case KeyEvent.VK_A:
-				direction = 3;
-				break;
-			}
+		case KeyEvent.VK_UP:
+			ConnectState.getClientThread().setDirection(0);
+			break;
+		case KeyEvent.VK_RIGHT:
+			ConnectState.getClientThread().setDirection(1);
+			break;
+		case KeyEvent.VK_DOWN:
+			ConnectState.getClientThread().setDirection(2);
+			break;
+		case KeyEvent.VK_LEFT:
+			ConnectState.getClientThread().setDirection(3);
+			break;
 		}
 	}
 
@@ -164,6 +144,11 @@ public class Player
 		}
 
 		return false;
+	}
+
+	public void setDirection(int direction)
+	{
+		this.direction = direction;
 	}
 
 	public void addToLength(int addend)
