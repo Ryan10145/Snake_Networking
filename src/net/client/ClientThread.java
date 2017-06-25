@@ -76,7 +76,8 @@ public class ClientThread extends Thread
 
 				break;
 			case GENERATE_FOOD:
-
+				Packet04GenerateFood foodPacket = new Packet04GenerateFood(data);
+				PlayState.setFoodCoordinates(foodPacket.getCoordinates()[0], foodPacket.getCoordinates()[1]);
 				break;
 			case PAUSE:
 				Packet05Pause packet = new Packet05Pause(data);
@@ -86,6 +87,9 @@ public class ClientThread extends Thread
 				JOptionPane.showMessageDialog(null, "Unable to connect, too many players",
 						"Error", JOptionPane.ERROR_MESSAGE);
 				System.exit(0);
+				break;
+			case RESTART:
+				PlayState.restart();
 				break;
 		}
 	}
@@ -161,5 +165,17 @@ public class ClientThread extends Thread
 	{
 		Packet05Pause pausePacket = new Packet05Pause(isPaused);
 		pausePacket.writeData(this);
+	}
+
+	public void generateFood(int column, int row)
+	{
+		Packet04GenerateFood foodPacket = new Packet04GenerateFood(column, row);
+		foodPacket.writeData(this);
+	}
+
+	public void restart()
+	{
+		Packet07Restart restartPacket = new Packet07Restart();
+		restartPacket.writeData(this);
 	}
 }

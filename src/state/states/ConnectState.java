@@ -21,7 +21,7 @@ public class ConnectState extends State
 		init();
 	}
 
-	public void init()
+	public void init() //TODO Refuse all spaces/blank usernames
 	{
 		Packet00Login packet00Login = new Packet00Login(JOptionPane.showInputDialog("Enter a Username"));
 

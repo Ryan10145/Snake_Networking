@@ -70,14 +70,19 @@ public class ServerThread extends Thread
 			case MOVE:
 				break;
 			case GENERATE_FOOD:
+				Packet04GenerateFood foodPacket = new Packet04GenerateFood(data);
+				foodPacket.writeData(this);
 				break;
 			case PAUSE:
-				System.out.println("Received the pause packet");
 				Packet05Pause packetPause = new Packet05Pause(data);
 				packetPause.writeData(this);
 				break;
 			case ERROR_PLAYERS:
 
+				break;
+			case RESTART:
+				Packet07Restart restartPacket = new Packet07Restart();
+				restartPacket.writeData(this);
 				break;
 		}
 	}

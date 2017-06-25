@@ -52,16 +52,19 @@ public class PlayState extends State
 
 	private void generateFood()
 	{
-		foodCoordinates[0] = (int) (Math.random() * (GamePanel.WIDTH / tileLength));
-		foodCoordinates[1] = (int) (Math.random() * (GamePanel.HEIGHT / tileLength));
+		int column = (int) (Math.random() * (GamePanel.WIDTH / tileLength));
+		int row = (int) (Math.random() * (GamePanel.HEIGHT / tileLength));
 
 		for(Player player : ConnectState.getClientThread().getPlayers())
 		{
 			if(player.hasCoordinates(foodCoordinates))
 			{
 				generateFood();
+				return;
 			}
 		}
+
+		ConnectState.getClientThread().generateFood(column, row);
 	}
 
 	public void draw(Graphics2D g2d)
@@ -110,6 +113,10 @@ public class PlayState extends State
 		{
 			ConnectState.getClientThread().setPaused(!paused);
 		}
+		else if(key == KeyEvent.VK_SPACE)
+		{
+			ConnectState.getClientThread().restart();
+		}
 	}
 
 	public void keyReleased(int key)
@@ -155,5 +162,14 @@ public class PlayState extends State
 	{
 		foodCoordinates[0] = column;
 		foodCoordinates[1] = row;
+	}
+
+	public static void restart()
+	{
+		for(PlayerMP player : ConnectState.getClientThread().getPlayers())
+		{
+			player.setGameOver(false);
+			player.init();
+		}
 	}
 }

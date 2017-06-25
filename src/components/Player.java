@@ -33,7 +33,7 @@ public class Player
 		init();
 	}
 
-	private void init()
+	public void init()
 	{
 		segments = new LinkedList<>();
 		segments.add(new int[] {initialColumn, initialRow});
@@ -131,10 +131,6 @@ public class Player
 			case KeyEvent.VK_LEFT:
 				direction = 3;
 				break;
-			case KeyEvent.VK_SPACE:
-				gameOver = false;
-				init();
-				break;
 			}
 		}
 		else if(control == 1)
@@ -152,10 +148,6 @@ public class Player
 				break;
 			case KeyEvent.VK_A:
 				direction = 3;
-				break;
-			case KeyEvent.VK_SPACE:
-				gameOver = false;
-				init();
 				break;
 			}
 		}
@@ -192,5 +184,10 @@ public class Player
 	public boolean isGameOver()
 	{
 		return gameOver;
+	}
+
+	public void setGameOver(boolean gameOver)
+	{
+		this.gameOver = gameOver;
 	}
 }
