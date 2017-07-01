@@ -94,6 +94,11 @@ public class ClientThread extends Thread
 			case RESTART:
 				PlayState.restart();
 				break;
+			case SERVER_LOCKED:
+				JOptionPane.showMessageDialog(null, "Unable to connect, game has started",
+						"Error", JOptionPane.ERROR_MESSAGE);
+				System.exit(0);
+				break;
 		}
 	}
 
@@ -126,7 +131,6 @@ public class ClientThread extends Thread
 			if(players.size() <= i)
 			{
 				playerIndex = i;
-				System.out.println("asd");
 				break;
 			}
 			else if(players.get(i) == null)

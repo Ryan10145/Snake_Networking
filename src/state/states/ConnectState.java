@@ -21,7 +21,7 @@ public class ConnectState extends State
 		init();
 	}
 
-	public void init() //TODO Refuse all spaces/blank usernames
+	public void init()
 	{
 		String username;
 		do

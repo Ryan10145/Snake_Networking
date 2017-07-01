@@ -8,7 +8,7 @@ public abstract class Packet
 	public enum PacketType
 	{
 		INVALID(-1), LOGIN(00), DISCONNECT(01), NEW_PLAYER(02), MOVE(03), GENERATE_FOOD(04),
-			PAUSE(05), ERROR_PLAYERS(06), RESTART(07);
+			PAUSE(05), ERROR_PLAYERS(06), RESTART(07), SERVER_LOCKED(10);
 
 		private int packetId;
 

@@ -13,10 +13,12 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerThread extends Thread
+public class ServerThread extends Thread //TODO Decide what happens when a player joins a game in progress
 {
 	private DatagramSocket socket;
 	private List<PlayerMP> players = new ArrayList<>();
+
+	private boolean locked = false;
 
 	public ServerThread()
 	{
@@ -60,7 +62,8 @@ public class ServerThread extends Thread
 			case INVALID:
 				break;
 			case LOGIN:
-				handleLogin(new Packet00Login(data), address, port);
+				if(!locked) handleLogin(new Packet00Login(data), address, port);
+				else sendData(new Packet10ServerLocked().getData(), address, port);
 				break;
 			case DISCONNECT:
 				handleDisconnect(new Packet01Disconnect(data), address, port);
@@ -78,6 +81,8 @@ public class ServerThread extends Thread
 			case PAUSE:
 				Packet05Pause packetPause = new Packet05Pause(data);
 				packetPause.writeData(this);
+
+				locked = true;
 				break;
 			case ERROR_PLAYERS:
 
@@ -85,6 +90,8 @@ public class ServerThread extends Thread
 			case RESTART:
 				Packet07Restart restartPacket = new Packet07Restart();
 				restartPacket.writeData(this);
+				break;
+			case SERVER_LOCKED:
 				break;
 		}
 	}
