@@ -4,6 +4,7 @@ import components.Player;
 import components.PlayerMP;
 import main.GamePanel;
 import net.client.ClientThread;
+import net.packet.Packet11Score;
 import state.State;
 
 import java.awt.*;
@@ -40,12 +41,17 @@ public class PlayState extends State
 				if(!player.isGameOver())
 				{
 					player.update(ConnectState.getClientThread().getPlayers());
-					if(player.hasCoordinates(foodCoordinates))
-					{
-						player.addToLength(1);
-						generateFood();
-					}
 				}
+			}
+		}
+
+		if(ConnectState.getClientThread().getCurrentPlayer() != null)
+		{
+			if(ConnectState.getClientThread().getCurrentPlayer().hasCoordinates(foodCoordinates))
+			{
+				generateFood();
+
+				ConnectState.getClientThread().score();
 			}
 		}
 	}
@@ -55,9 +61,9 @@ public class PlayState extends State
 		int column = (int) (Math.random() * (GamePanel.WIDTH / tileLength));
 		int row = (int) (Math.random() * (GamePanel.HEIGHT / tileLength));
 
-		for(Player player : ConnectState.getClientThread().getPlayers())
+		if(ConnectState.getClientThread().getCurrentPlayer() != null)
 		{
-			if(player.hasCoordinates(new int[] {column, row}))
+			if(ConnectState.getClientThread().getCurrentPlayer().hasCoordinates(new int[]{column, row}))
 			{
 				generateFood();
 				return;
@@ -73,17 +79,16 @@ public class PlayState extends State
 		g2d.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
 
 		for(int i = 0; i < ConnectState.getClientThread().getPlayers().size(); i++)
-			//TODO Set different colors for the players, and set their score to be the same color
 		{
 			Player player = ConnectState.getClientThread().getPlayers().get(i);
 
-			g2d.setColor(Color.WHITE);
+			g2d.setColor(player.getColor());
 			g2d.setFont(new Font("default", Font.BOLD, 40));
 
 			int length = g2d.getFontMetrics().stringWidth(Integer.toString(player.getLength()));
 			g2d.drawString(Integer.toString(player.getLength()), (GamePanel.WIDTH - length + (i - 2) * 150) / 2, 50);
 
-			player.draw(g2d, Color.ORANGE, Color.YELLOW);
+			player.draw(g2d);
 		}
 
 		g2d.setColor(Color.GREEN);
@@ -131,19 +136,19 @@ public class PlayState extends State
 		{
 		case 0:
 			player = new PlayerMP(7, 7, tileLength, 1,
-					address, port, username, local);
+					address, port, username, local, Color.ORANGE);
 			break;
 		case 1:
 			player = new PlayerMP(GamePanel.WIDTH / tileLength - 7, 7, tileLength, 1,
-					address, port, username, local);
+					address, port, username, local, Color.GREEN);
 			break;
 		case 2:
 			player = new PlayerMP(GamePanel.WIDTH / tileLength - 7, GamePanel.HEIGHT / tileLength - 7, tileLength, 1,
-					address, port, username, local);
+					address, port, username, local, Color.RED);
 			break;
 		case 3:
 			player = new PlayerMP(7, GamePanel.HEIGHT / tileLength - 7, tileLength, 1,
-					address, port, username, local);
+					address, port, username, local, Color.WHITE);
 			break;
 		default:
 			player = null;

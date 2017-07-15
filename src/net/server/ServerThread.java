@@ -13,7 +13,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerThread extends Thread //TODO Decide what happens when a player joins a game in progress
+public class ServerThread extends Thread
 {
 	private DatagramSocket socket;
 	private List<PlayerMP> players = new ArrayList<>();
@@ -66,7 +66,7 @@ public class ServerThread extends Thread //TODO Decide what happens when a playe
 				else sendData(new Packet10ServerLocked().getData(), address, port);
 				break;
 			case DISCONNECT:
-				handleDisconnect(new Packet01Disconnect(data), address, port);
+				handleDisconnect(new Packet01Disconnect(data));
 				break;
 			case NEW_PLAYER:
 				break;
@@ -92,6 +92,10 @@ public class ServerThread extends Thread //TODO Decide what happens when a playe
 				restartPacket.writeData(this);
 				break;
 			case SERVER_LOCKED:
+				break;
+			case SCORE:
+				Packet11Score scorePacket = new Packet11Score(data);
+				scorePacket.writeData(this);
 				break;
 		}
 	}
@@ -162,7 +166,7 @@ public class ServerThread extends Thread //TODO Decide what happens when a playe
 		}
 	}
 
-	private void handleDisconnect(Packet01Disconnect packet, InetAddress address, int port)
+	private void handleDisconnect(Packet01Disconnect packet)
 	{
 		System.out.println(packet.getUsername() + " has left.");
 		removePlayer(packet);

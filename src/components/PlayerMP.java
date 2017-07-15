@@ -1,5 +1,6 @@
 package components;
 
+import java.awt.*;
 import java.net.InetAddress;
 
 public class PlayerMP extends Player
@@ -10,9 +11,9 @@ public class PlayerMP extends Player
 	private boolean local;
 
 	public PlayerMP(int startingColumn, int startingRow, int tileLength, int direction, InetAddress ipAddress,
-			int port, String username, boolean local)
+			int port, String username, boolean local, Color color)
 	{
-		super(startingColumn, startingRow, tileLength, direction);
+		super(startingColumn, startingRow, tileLength, direction, color);
 		this.ipAddress = ipAddress;
 		this.port = port;
 		this.username = username;

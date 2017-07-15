@@ -76,7 +76,11 @@ public class ClientThread extends Thread
 			case MOVE:
 				Packet03Move movePacket = new Packet03Move(data);
 				Player player = getPlayerMP(movePacket.getUsername());
-				if(player != null) player.setDirection(movePacket.getDirection());
+				if(player != null)
+				{
+					player.setDirection(movePacket.getDirection());
+					player.setCoordinates(movePacket.getCoordinates());
+				}
 				break;
 			case GENERATE_FOOD:
 				Packet04GenerateFood foodPacket = new Packet04GenerateFood(data);
@@ -98,6 +102,11 @@ public class ClientThread extends Thread
 				JOptionPane.showMessageDialog(null, "Unable to connect, game has started",
 						"Error", JOptionPane.ERROR_MESSAGE);
 				System.exit(0);
+				break;
+			case SCORE:
+				Packet11Score scorePacket = new Packet11Score(data);
+				Player playerScore = getPlayerMP(scorePacket.getUsername());
+				if(playerScore != null) playerScore.addToLength(1);
 				break;
 		}
 	}
@@ -197,9 +206,15 @@ public class ClientThread extends Thread
 		restartPacket.writeData(this);
 	}
 
-	public void setDirection(int direction)
+	public void move(int direction, int col, int row)
 	{
-		Packet03Move movePacket = new Packet03Move(currentPlayer.getUsername(), direction);
+		Packet03Move movePacket = new Packet03Move(currentPlayer.getUsername(), direction, col, row);
 		movePacket.writeData(this);
+	}
+
+	public void score()
+	{
+		Packet11Score scorePacket = new Packet11Score(currentPlayer.getUsername());
+		scorePacket.writeData(this);
 	}
 }

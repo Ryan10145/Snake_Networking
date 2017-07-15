@@ -23,13 +23,15 @@ public class Player
 	private int frame;
 
 	private boolean gameOver;
+	private Color color;
 
-	Player(int startingColumn, int startingRow, int tileLength, int direction)
+	Player(int startingColumn, int startingRow, int tileLength, int direction, Color color)
 	{
 		this.initialColumn = startingColumn;
 		this.initialRow = startingRow;
 		this.tileLength = tileLength;
 		this.initialDirection = direction;
+		this.color = color;
 
 		init();
 	}
@@ -49,7 +51,7 @@ public class Player
 
 	public void update(ArrayList<PlayerMP> players)
 	{
-		if(frame % 5 == 0 && !gameOver)
+		if(!gameOver)
 		{
 			int[] headCoordinatesCopy = segments.get(0).clone();
 			switch(direction)
@@ -98,18 +100,18 @@ public class Player
 		frame++;
 	}
 
-	public void draw(Graphics2D g2d, Color segmentColor, Color headColor)
+	public void draw(Graphics2D g2d)
 	{
 		for(int[] coordinates : segments)
 		{
-			if(!gameOver) g2d.setColor(segmentColor);
-			else g2d.setColor(segmentColor.darker());
+			if(!gameOver) g2d.setColor(color);
+			else g2d.setColor(color.darker());
 			g2d.fillRect(coordinates[0] * tileLength, coordinates[1] * tileLength,
 					tileLength, tileLength);
 		}
 
-		if(!gameOver) g2d.setColor(headColor);
-		else g2d.setColor(headColor.darker());
+		if(!gameOver) g2d.setColor(color.brighter());
+		else g2d.setColor(color);
 		g2d.fillRect(getHead()[0] * tileLength, getHead()[1] * tileLength,
 				tileLength, tileLength);
 	}
@@ -119,16 +121,16 @@ public class Player
 		switch(key)
 		{
 		case KeyEvent.VK_UP:
-			ConnectState.getClientThread().setDirection(0);
+			ConnectState.getClientThread().move(0, getHead()[0], getHead()[1]);
 			break;
 		case KeyEvent.VK_RIGHT:
-			ConnectState.getClientThread().setDirection(1);
+			ConnectState.getClientThread().move(1, getHead()[0], getHead()[1]);
 			break;
 		case KeyEvent.VK_DOWN:
-			ConnectState.getClientThread().setDirection(2);
+			ConnectState.getClientThread().move(2, getHead()[0], getHead()[1]);
 			break;
 		case KeyEvent.VK_LEFT:
-			ConnectState.getClientThread().setDirection(3);
+			ConnectState.getClientThread().move(3, getHead()[0], getHead()[1]);
 			break;
 		}
 	}
@@ -144,6 +146,11 @@ public class Player
 		}
 
 		return false;
+	}
+
+	public void setCoordinates(int[] coordinates)
+	{
+
 	}
 
 	public void setDirection(int direction)
@@ -174,5 +181,10 @@ public class Player
 	public void setGameOver(boolean gameOver)
 	{
 		this.gameOver = gameOver;
+	}
+
+	public Color getColor()
+	{
+		return color;
 	}
 }
